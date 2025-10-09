@@ -56,10 +56,21 @@ export function ChatComponent() {
       });
 
       const element = ref.current as any;
-      console.log('[ChatKit] Web component properties:', {
+      console.log('[ChatKit] Web component properties before:', {
         api: element.api,
         sessionToken: element.sessionToken,
       });
+
+      // Try setting the api directly on the element
+      if (!element.api) {
+        console.log('[ChatKit] Setting api property directly');
+        element.api = {
+          getChatKitSessionToken: sessionTokenGetter,
+        };
+        console.log('[ChatKit] Web component properties after:', {
+          api: element.api,
+        });
+      }
     }
   }, [ref, control]);
 
