@@ -34,13 +34,22 @@ export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
 
   useEffect(() => {
+    let attempts = 0;
+    const maxAttempts = 50;
+
     const checkChatKitLoaded = () => {
+      attempts++;
+      console.log(`Checking for ChatKit library (attempt ${attempts}/${maxAttempts})...`);
+      console.log('window.openai:', window.openai);
+
       if (window.openai?.chatkit) {
-        console.log('ChatKit library detected');
+        console.log('ChatKit library detected!');
         setIsLoaded(true);
+      } else if (attempts >= maxAttempts) {
+        console.error('ChatKit library failed to load after maximum attempts');
+        console.error('This might be a CORS issue or the CDN is not accessible');
       } else {
-        console.log('Waiting for ChatKit library...');
-        setTimeout(checkChatKitLoaded, 100);
+        setTimeout(checkChatKitLoaded, 200);
       }
     };
 
