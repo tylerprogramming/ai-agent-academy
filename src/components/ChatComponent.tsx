@@ -33,44 +33,21 @@ export function ChatComponent() {
   useEffect(() => {
     if (ref.current) {
       const element = ref.current as any;
-      console.log('[ChatKit] Setting up web component for device:', deviceId);
+      console.log('[ChatKit] Getting session token for device:', deviceId);
 
-      element.api = {
-        getChatKitSessionToken: async () => {
-          console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
-          try {
-            const token = await getChatKitSessionToken(deviceId);
-            console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
-            return token;
-          } catch (error) {
-            console.error('[ChatKit] Error getting session token:', error);
-            throw error;
+      getChatKitSessionToken(deviceId)
+        .then((token) => {
+          console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
+          element.sessionToken = token;
+          console.log('[ChatKit] sessionToken set on element');
+
+          if (control.setInstance) {
+            control.setInstance(element);
           }
-        },
-      };
-
-      console.log('[ChatKit] API set on element:', element.api);
-
-      if (control.setInstance) {
-        console.log('[ChatKit] Calling setInstance');
-        control.setInstance(element);
-      }
-
-      setTimeout(() => {
-        console.log('[ChatKit] After setInstance - loaded:', element.getAttribute('data-loaded'));
-        console.log('[ChatKit] After setInstance - sessionToken:', element.sessionToken);
-        console.log('[ChatKit] After setInstance - api:', element.api);
-
-        if (element.load && typeof element.load === 'function') {
-          console.log('[ChatKit] Calling load() method');
-          element.load();
-        }
-
-        if (element.init && typeof element.init === 'function') {
-          console.log('[ChatKit] Calling init() method');
-          element.init();
-        }
-      }, 100);
+        })
+        .catch((error) => {
+          console.error('[ChatKit] Error getting session token:', error);
+        });
     }
   }, [ref, control, deviceId]);
 
