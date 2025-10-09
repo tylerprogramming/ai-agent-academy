@@ -64,11 +64,6 @@ export function ChatComponent() {
   return (
     <ChatKit
       clientSecret={clientSecret}
-      options={{
-        appearance: {
-          theme: 'light'
-        }
-      }}
       className="h-full w-full"
     />
   );
