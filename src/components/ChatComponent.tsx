@@ -1,7 +1,6 @@
 import { ChatKit, useChatKit } from '@openai/chatkit-react';
 import { useState } from 'react';
 import getChatKitSessionToken from '../utils/chatkit';
-import { AlertCircle } from 'lucide-react';
 
 function getOrCreateDeviceId(): string {
   const DEVICE_ID_KEY = 'chatkit_device_id';
