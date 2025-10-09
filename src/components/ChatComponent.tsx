@@ -17,7 +17,7 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
      const { control } = useChatKit({
        api: {
-         async getClientSecret(existing) {
+         async getChatKitSessionToken(existing) {
            if (existing) {
              // implement session refresh
            }
