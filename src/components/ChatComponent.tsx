@@ -18,10 +18,6 @@ export function ChatComponent() {
      const { control } = useChatKit({
        api: {
          async getChatKitSessionToken(existing) {
-           if (existing) {
-             // implement session refresh
-           }
-
            const res = await fetch('/api/chatkit/session', {
              method: 'POST',
              headers: {
