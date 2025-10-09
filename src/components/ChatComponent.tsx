@@ -44,6 +44,8 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
     if (control) {
       console.log('[ChatKit] Control ready:', control);
       console.log('[ChatKit] Control.options:', control.options);
+      console.log('[ChatKit] Control.setInstance:', control.setInstance);
+      console.log('[ChatKit] Type of setInstance:', typeof control.setInstance);
 
       // Check the DOM element
       setTimeout(() => {
@@ -56,8 +58,26 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
             console.log('[ChatKit] Shadow root children:', element.shadowRoot.children);
             console.log('[ChatKit] Shadow root HTML:', element.shadowRoot.innerHTML.substring(0, 500));
           }
+
+          // Check if element has any special properties
+          console.log('[ChatKit] Element properties:', Object.keys(element));
+          console.log('[ChatKit] Element._ck:', (element as any)._ck);
         }
       }, 1000);
+
+      // Try calling setInstance manually
+      setTimeout(() => {
+        console.log('[ChatKit] Attempting manual setInstance call...');
+        const element = document.querySelector('openai-chatkit');
+        if (element) {
+          try {
+            control.setInstance(element);
+            console.log('[ChatKit] Manual setInstance succeeded');
+          } catch (error) {
+            console.error('[ChatKit] Manual setInstance failed:', error);
+          }
+        }
+      }, 2000);
     }
   }, [control]);
 
