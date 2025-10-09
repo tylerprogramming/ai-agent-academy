@@ -34,16 +34,26 @@ export function ChatComponent() {
     if (ref.current) {
       const element = ref.current as any;
       console.log('[ChatKit] Getting session token for device:', deviceId);
+      console.log('[ChatKit] Element:', element);
+      console.log('[ChatKit] Element tagName:', element.tagName);
 
       getChatKitSessionToken(deviceId)
         .then((token) => {
           console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
           element.sessionToken = token;
           console.log('[ChatKit] sessionToken set on element');
+          console.log('[ChatKit] Element after token set:', element);
+          console.log('[ChatKit] Element innerHTML:', element.innerHTML);
+          console.log('[ChatKit] Element children:', element.children);
 
           if (control.setInstance) {
             control.setInstance(element);
           }
+
+          setTimeout(() => {
+            console.log('[ChatKit] After 1s - Element innerHTML:', element.innerHTML);
+            console.log('[ChatKit] After 1s - Element children:', element.children);
+          }, 1000);
         })
         .catch((error) => {
           console.error('[ChatKit] Error getting session token:', error);
