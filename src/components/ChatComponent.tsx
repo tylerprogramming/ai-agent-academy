@@ -1,5 +1,4 @@
 import { ChatKit, useChatKit } from '@openai/chatkit-react';
-import { useEffect, useState } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 function getOrCreateDeviceId(): string {
@@ -25,5 +24,9 @@ export function ChatComponent() {
     },
   });
 
-  return <ChatKit control={control} className="h-full w-full" />;
+  return (
+    <div className="h-full w-full">
+      <ChatKit control={control} />
+    </div>
+  );
 }

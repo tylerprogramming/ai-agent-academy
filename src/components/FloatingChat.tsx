@@ -22,13 +22,13 @@ export function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-bottom-4">
-          <div className="h-full flex flex-col">
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4">
+        <div className="fixed bottom-24 right-6 z-50 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-bottom-4">
+          <div className="flex flex-col h-[600px]">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4 shrink-0">
               <h3 className="font-semibold text-lg">AI Learning Assistant</h3>
               <p className="text-sm text-blue-100">How can I help you today?</p>
             </div>
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 min-h-0">
               <ChatComponent />
             </div>
           </div>
