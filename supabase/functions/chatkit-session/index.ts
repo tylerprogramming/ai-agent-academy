@@ -15,11 +15,11 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const openaiApiKey = Deno.env.get("OPENAI_API_SECRET_KEY");
+    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
     const workflowId = Deno.env.get("CHATKIT_WORKFLOW_ID");
-    
+
     if (!openaiApiKey) {
-      throw new Error("OPENAI_API_SECRET_KEY environment variable is not set");
+      throw new Error("OPENAI_API_KEY environment variable is not set");
     }
 
     if (!workflowId) {
