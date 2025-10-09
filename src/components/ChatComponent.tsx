@@ -55,6 +55,22 @@ export function ChatComponent() {
         console.log('[ChatKit] Calling setInstance');
         control.setInstance(element);
       }
+
+      setTimeout(() => {
+        console.log('[ChatKit] After setInstance - loaded:', element.getAttribute('data-loaded'));
+        console.log('[ChatKit] After setInstance - sessionToken:', element.sessionToken);
+        console.log('[ChatKit] After setInstance - api:', element.api);
+
+        if (element.load && typeof element.load === 'function') {
+          console.log('[ChatKit] Calling load() method');
+          element.load();
+        }
+
+        if (element.init && typeof element.init === 'function') {
+          console.log('[ChatKit] Calling init() method');
+          element.init();
+        }
+      }, 100);
     }
   }, [ref, control, deviceId]);
 
