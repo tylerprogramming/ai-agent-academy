@@ -54,36 +54,25 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
     console.log('[ChatKit] Effect running - control:', control);
 
     if (chatkitRef.current && control) {
-      console.log('[ChatKit] Both ref and control available, calling setInstance');
-      console.log('[ChatKit] Control.handlers:', control.handlers);
+      console.log('[ChatKit] Both ref and control available');
+      console.log('[ChatKit] Element before setInstance:', chatkitRef.current);
+      console.log('[ChatKit] Element methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(chatkitRef.current)));
+
+      // Try to call any initialization method on the element itself
+      const element = chatkitRef.current as any;
+      console.log('[ChatKit] Element.init:', element.init);
+      console.log('[ChatKit] Element.connect:', element.connect);
+      console.log('[ChatKit] Element.connectedCallback:', element.connectedCallback);
+
       control.setInstance(chatkitRef.current);
+      console.log('[ChatKit] setInstance called');
 
-      // Check shadow root after setInstance
+      // Check if there's an init or start method we need to call
       setTimeout(() => {
-        if (chatkitRef.current?.shadowRoot) {
-          console.log('[ChatKit] Shadow root children after setInstance:', chatkitRef.current.shadowRoot.children.length);
-          console.log('[ChatKit] Shadow root HTML:', chatkitRef.current.shadowRoot.innerHTML.substring(0, 1000));
-
-          // Check element attributes
-          console.log('[ChatKit] Element attributes:', {
-            'data-loaded': chatkitRef.current.getAttribute('data-loaded'),
-            'data-color-scheme': chatkitRef.current.getAttribute('data-color-scheme'),
-          });
-
-          // Try to look for any error messages
-          const allElements = chatkitRef.current.shadowRoot.querySelectorAll('*');
-          console.log('[ChatKit] All shadow DOM elements:', allElements);
-        }
-      }, 1000);
-
-      // Try waiting longer
-      setTimeout(() => {
-        if (chatkitRef.current?.shadowRoot) {
-          console.log('[ChatKit] After 3s - Shadow root children:', chatkitRef.current.shadowRoot.children.length);
-          const allElements = chatkitRef.current.shadowRoot.querySelectorAll('*');
-          console.log('[ChatKit] After 3s - All shadow DOM elements:', allElements);
-        }
-      }, 3000);
+        console.log('[ChatKit] Checking for initialization...');
+        console.log('[ChatKit] Control methods:', Object.keys(control));
+        console.log('[ChatKit] Control.handlers methods:', Object.keys(control.handlers));
+      }, 500);
     }
   }, [control]);
 
