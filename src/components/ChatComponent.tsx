@@ -51,7 +51,17 @@ export function ChatComponent() {
     );
   }
 
-  return <ChatKit clientSecret={clientSecret} className="h-full w-full" />;
+  return (
+    <ChatKit
+      clientSecret={clientSecret}
+      options={{
+        appearance: {
+          theme: 'light'
+        }
+      }}
+      className="h-full w-full"
+    />
+  );
 }
 
 function getOrCreateDeviceId(): string {
