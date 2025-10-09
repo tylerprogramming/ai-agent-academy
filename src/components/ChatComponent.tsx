@@ -128,10 +128,11 @@ export function ChatComponent() {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'column' }}>
       <ChatKit
         control={chatkit.control}
-        className="block h-full w-full"
+        className="block"
+        style={{ flex: 1, minHeight: 0, width: '100%', height: '100%' }}
       />
     </div>
   );
