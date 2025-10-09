@@ -21,22 +21,7 @@ export function ChatComponent() {
     console.log('ChatComponent mounted with deviceId:', deviceId);
   }, [deviceId]);
 
-  const sessionTokenGetter = async () => {
-    console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
-    try {
-      const token = await getChatKitSessionToken(deviceId);
-      console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
-      return token;
-    } catch (error) {
-      console.error('[ChatKit] Error getting session token:', error);
-      throw error;
-    }
-  };
-
   const { control, ref } = useChatKit({
-    api: {
-      getChatKitSessionToken: sessionTokenGetter,
-    },
     onError: (error) => {
       console.error('[ChatKit] onError event:', error);
     },
@@ -46,28 +31,32 @@ export function ChatComponent() {
   });
 
   useEffect(() => {
-    console.log('[ChatKit] ref.current:', ref.current);
-    console.log('[ChatKit] control:', control);
-    console.log('[ChatKit] control.handlers:', control?.handlers);
-
     if (ref.current) {
       const element = ref.current as any;
-      console.log('[ChatKit] Web component api:', element.api);
-      console.log('[ChatKit] Loaded state:', element.getAttribute('data-loaded'));
+      console.log('[ChatKit] Setting up web component for device:', deviceId);
 
-      // Try to manually trigger initialization
-      if (element.api && !element.getAttribute('data-loaded')) {
-        console.log('[ChatKit] Attempting to call getChatKitSessionToken manually...');
-        element.api.getChatKitSessionToken()
-          .then((token: string) => {
-            console.log('[ChatKit] Manual call successful, token:', token.substring(0, 20));
-          })
-          .catch((error: any) => {
-            console.error('[ChatKit] Manual call failed:', error);
-          });
+      element.api = {
+        getChatKitSessionToken: async () => {
+          console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
+          try {
+            const token = await getChatKitSessionToken(deviceId);
+            console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
+            return token;
+          } catch (error) {
+            console.error('[ChatKit] Error getting session token:', error);
+            throw error;
+          }
+        },
+      };
+
+      console.log('[ChatKit] API set on element:', element.api);
+
+      if (control.setInstance) {
+        console.log('[ChatKit] Calling setInstance');
+        control.setInstance(element);
       }
     }
-  }, [ref, control]);
+  }, [ref, control, deviceId]);
 
   return (
     <div className="h-full w-full bg-gray-50">
