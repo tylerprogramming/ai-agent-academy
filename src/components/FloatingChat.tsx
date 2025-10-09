@@ -6,39 +6,34 @@ interface FloatingChatProps {
   onToggle: () => void;
 }
 
-export function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
+export default function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
+
   return (
     <>
+      <button
+        onClick={onToggle}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all flex items-center justify-center"
+      >
+        {isOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <MessageCircle className="w-6 h-6" />
+        )}
+      </button>
+
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden z-50 animate-scale-in">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-            <div>
-              <h3 className="text-white font-semibold text-lg">AI Learning Assistant</h3>
-              <p className="text-blue-100 text-xs">Ask me anything about AI</p>
+        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-bottom-4">
+          <div className="h-full flex flex-col">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-4">
+              <h3 className="font-semibold text-lg">AI Learning Assistant</h3>
+              <p className="text-sm text-blue-100">How can I help you today?</p>
             </div>
-            <button
-              onClick={onToggle}
-              className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <ChatComponent />
+            <div className="flex-1 overflow-hidden">
+              <ChatComponent />
+            </div>
           </div>
         </div>
       )}
-
-      <button
-        onClick={onToggle}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full shadow-2xl hover:shadow-blue-500/50 hover:scale-110 transition-all duration-300 flex items-center justify-center z-50 group"
-      >
-        {isOpen ? (
-          <X className="w-7 h-7" />
-        ) : (
-          <MessageSquare className="w-7 h-7 group-hover:scale-110 transition-transform" />
-        )}
-      </button>
     </>
   );
 }
