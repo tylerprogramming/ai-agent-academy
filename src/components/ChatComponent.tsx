@@ -18,33 +18,46 @@ export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
 
   useEffect(() => {
-    console.log('ChatComponent mounted');
-  }, []);
+    console.log('ChatComponent mounted with deviceId:', deviceId);
+  }, [deviceId]);
 
   const { control, ref } = useChatKit({
     api: {
       getChatKitSessionToken: async () => {
-        console.log('Getting ChatKit session token for device:', deviceId);
+        console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
         try {
           const token = await getChatKitSessionToken(deviceId);
-          console.log('ChatKit session token received:', token.substring(0, 20) + '...');
+          console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
           return token;
         } catch (error) {
-          console.error('Error getting ChatKit session token:', error);
+          console.error('[ChatKit] Error getting session token:', error);
           throw error;
         }
       },
     },
+    onError: (error) => {
+      console.error('[ChatKit] onError event:', error);
+    },
+    onMessageCreated: (event) => {
+      console.log('[ChatKit] onMessageCreated:', event);
+    },
   });
 
   useEffect(() => {
-    console.log('useChatKit ref:', ref.current);
-    console.log('useChatKit control:', control);
+    console.log('[ChatKit] ref.current:', ref.current);
+    console.log('[ChatKit] control:', control);
+
+    if (ref.current) {
+      console.log('[ChatKit] Web component attributes:', {
+        loaded: ref.current.getAttribute('data-loaded'),
+        colorScheme: ref.current.getAttribute('data-color-scheme'),
+      });
+    }
   }, [ref, control]);
 
   return (
     <div className="h-full w-full bg-gray-50">
-      <ChatKit control={control} className="w-full h-full" />
+      <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 }
