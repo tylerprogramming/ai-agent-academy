@@ -17,6 +17,7 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [clientToken, setClientToken] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('ChatComponent mounted with deviceId:', deviceId);
@@ -32,19 +33,21 @@ export function ChatComponent() {
     return () => clearInterval(checkScript);
   }, [deviceId]);
 
+  useEffect(() => {
+    if (scriptLoaded && !clientToken) {
+      console.log('[ChatKit] Fetching client token...');
+      getChatKitSessionToken(deviceId).then((token) => {
+        console.log('[ChatKit] Got token:', token.substring(0, 20) + '...');
+        setClientToken(token);
+      }).catch((error) => {
+        console.error('[ChatKit] Failed to get token:', error);
+      });
+    }
+  }, [scriptLoaded, deviceId, clientToken]);
+
   const { control } = useChatKit({
     api: {
-      async getClientSecret(existingToken) {
-        console.log('[ChatKit] getClientSecret called, existingToken:', !!existingToken);
-        try {
-          const token = await getChatKitSessionToken(deviceId);
-          console.log('[ChatKit] Returning token:', token.substring(0, 20) + '...');
-          return token;
-        } catch (error) {
-          console.error('[ChatKit] Failed to get token:', error);
-          throw error;
-        }
-      },
+      clientToken: clientToken || undefined,
     },
     startScreen: {
       greeting: "Welcome! How can I help you today?",
@@ -69,13 +72,27 @@ export function ChatComponent() {
     if (scriptLoaded && control) {
       console.log('[ChatKit] Control object methods:', Object.keys(control));
       console.log('[ChatKit] Control object:', control);
+      console.log('[ChatKit] Control.options:', control.options);
+      console.log('[ChatKit] Control.handlers:', control.handlers);
+
+      // Try to manually check if the element exists
+      const elements = document.getElementsByTagName('openai-chatkit');
+      console.log('[ChatKit] Found openai-chatkit elements:', elements.length);
+      if (elements.length > 0) {
+        console.log('[ChatKit] First element:', elements[0]);
+        console.log('[ChatKit] Element attributes:', Array.from(elements[0].attributes).map(a => `${a.name}=${a.value}`));
+      }
     }
   }, [scriptLoaded, control]);
 
-  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control);
+  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control, 'clientToken:', !!clientToken);
 
   if (!scriptLoaded) {
     return <div className="p-4">Loading ChatKit script...</div>;
+  }
+
+  if (!clientToken) {
+    return <div className="p-4">Fetching session token...</div>;
   }
 
   return (
@@ -84,6 +101,7 @@ export function ChatComponent() {
         <p className="text-sm">Debug: ChatKit component area</p>
         <p className="text-xs">Device ID: {deviceId}</p>
         <p className="text-xs">Script loaded: {scriptLoaded ? 'Yes' : 'No'}</p>
+        <p className="text-xs">Client token: {clientToken ? clientToken.substring(0, 20) + '...' : 'None'}</p>
         <p className="text-xs">Control: {control ? 'Ready' : 'Not ready'}</p>
       </div>
       <div className="border-2 border-green-500 p-2 bg-white">
