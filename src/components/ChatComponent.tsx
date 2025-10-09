@@ -59,7 +59,7 @@ export function ChatComponent() {
 
   return (
     <div className="h-full w-full">
-      <ChatComponent control={control} />
+      <ChatKit control={control} />
     </div>
   );
 }
