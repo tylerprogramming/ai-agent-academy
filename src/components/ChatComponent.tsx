@@ -62,6 +62,8 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
           // Check if element has any special properties
           console.log('[ChatKit] Element properties:', Object.keys(element));
           console.log('[ChatKit] Element._ck:', (element as any)._ck);
+          console.log('[ChatKit] Element.profile:', (element as any).profile);
+          console.log('[ChatKit] Element.capabilities:', (element as any).capabilities);
         }
       }, 1000);
 
@@ -73,6 +75,14 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
           try {
             control.setInstance(element);
             console.log('[ChatKit] Manual setInstance succeeded');
+
+            // Check shadow root again after setInstance
+            setTimeout(() => {
+              console.log('[ChatKit] After setInstance - Shadow root children:', element.shadowRoot?.children.length);
+              if (element.shadowRoot) {
+                console.log('[ChatKit] After setInstance - Shadow root HTML:', element.shadowRoot.innerHTML.substring(0, 500));
+              }
+            }, 500);
           } catch (error) {
             console.error('[ChatKit] Manual setInstance failed:', error);
           }
