@@ -2,68 +2,6 @@ import { ChatKit } from '@openai/chatkit-react';
 import getChatKitSessionToken from '../chatkit';
 import { useState, useEffect } from 'react';
 
-export function ChatComponent() {
-  const [error, setError] = useState<string | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log('Starting to fetch client secret...');
-
-    const deviceId = getOrCreateDeviceId();
-    console.log('Device ID:', deviceId);
-
-    getChatKitSessionToken(deviceId)
-      .then((secret) => {
-        console.log('Got client secret successfully');
-        setClientSecret(secret);
-      })
-      .catch((err) => {
-        console.error('Failed to get client secret:', err);
-        setError(err instanceof Error ? err.message : 'Failed to initialize chat');
-      });
-  }, []);
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8 h-full">
-        <div className="max-w-md bg-white rounded-2xl shadow-lg p-8 border border-red-200">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Error</h2>
-          <p className="text-slate-700 mb-2">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700"
-          >
-            Reload
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!clientSecret) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-slate-600">Initializing chat...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <ChatKit
-      clientSecret={clientSecret}
-      options={{
-        appearance: {
-          theme: 'light'
-        }
-      }}
-      className="h-full w-full"
-    />
-  );
-}
-
 function getOrCreateDeviceId(): string {
   const DEVICE_ID_KEY = 'chatkit_device_id';
   let deviceId = localStorage.getItem(DEVICE_ID_KEY);
@@ -74,4 +12,55 @@ function getOrCreateDeviceId(): string {
   }
 
   return deviceId;
+}
+
+export default function ChatComponent() {
+  const [error, setError] = useState<string | null>(null);
+
+  const { control } = useChatKit({
+    api: {
+      async getClientSecret(existing) {
+        if (existing) {
+          console.log('Using existing client secret');
+          return existing;
+        }
+
+        try {
+          const deviceId = getOrCreateDeviceId();
+          console.log('Getting client secret for device:', deviceId);
+          const clientSecret = await getChatKitSessionToken(deviceId);
+          console.log('Successfully got client secret');
+          return clientSecret;
+        } catch (err) {
+          console.error('Error getting client secret:', err);
+          setError(err instanceof Error ? err.message : 'Failed to get client secret');
+          throw err;
+        }
+      },
+    },
+  });
+
+  if (error) {
+    return (
+      <div className="h-full w-full flex items-center justify-center p-6">
+        <div className="text-center max-w-sm">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+          <p className="font-semibold text-gray-900 mb-2">Chat unavailable</p>
+          <p className="text-sm text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full w-full">
+      <ChatKit control={control} />
+    </div>
+  );
 }
