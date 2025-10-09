@@ -51,12 +51,8 @@ export function ChatComponent() {
 
   useEffect(() => {
     if (scriptLoaded && control) {
-      console.log('[ChatKit] Starting session...');
-      control.startSession().then(() => {
-        console.log('[ChatKit] Session started successfully');
-      }).catch((err) => {
-        console.error('[ChatKit] Session start failed:', err);
-      });
+      console.log('[ChatKit] Control object methods:', Object.keys(control));
+      console.log('[ChatKit] Control object:', control);
     }
   }, [scriptLoaded, control]);
 
