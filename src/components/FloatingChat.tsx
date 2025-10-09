@@ -1,5 +1,5 @@
 import { MessageSquare, X } from 'lucide-react';
-import { ChatComponent } from './ChatComponent';
+import ChatComponent from './ChatComponent';
 
 interface FloatingChatProps {
   isOpen: boolean;
