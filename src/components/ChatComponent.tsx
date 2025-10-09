@@ -56,6 +56,8 @@ export function ChatComponent() {
     }
   }, [scriptLoaded, control]);
 
+  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control);
+
   return (
     <div className="h-full w-full bg-gray-50">
       <div className="p-4 bg-blue-100 border border-blue-300 rounded mb-4">
@@ -64,7 +66,10 @@ export function ChatComponent() {
         <p className="text-xs">Script loaded: {scriptLoaded ? 'Yes' : 'No'}</p>
       </div>
       {scriptLoaded ? (
-        <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
+        <div className="border-2 border-green-500 p-2">
+          <p className="text-sm mb-2">ChatKit component should render here:</p>
+          <ChatKit control={control} style={{ width: '100%', height: '600px', border: '2px solid red' }} />
+        </div>
       ) : (
         <div className="p-4">Loading ChatKit...</div>
       )}
