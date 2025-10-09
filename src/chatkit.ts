@@ -1,8 +1,8 @@
 export default async function getChatKitSessionToken(
   deviceId: string
 ): Promise<string> {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mqxndxoaorwcepuawsrv.supabase.co';
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xeG5keG9hb3J3Y2VwdWF3c3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NTE4MDUsImV4cCI6MjA3NTQyNzgwNX0.zXDL8v7n1en0H-Zh2B8uIQRqu-T6JQhusLe5iyNZ-5M';
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Supabase environment variables are not configured');
