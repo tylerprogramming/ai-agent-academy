@@ -46,6 +46,17 @@ export function ChatComponent() {
         }
       },
     },
+    startScreen: {
+      greeting: "Welcome! How can I help you today?",
+      prompts: [
+        "Tell me about your courses",
+        "How do I get started?",
+        "What topics do you cover?"
+      ],
+    },
+    composer: {
+      placeholder: "Ask me anything...",
+    },
     onError: (error) => {
       console.error('[ChatKit] onError event:', error);
     },
