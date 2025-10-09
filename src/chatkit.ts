@@ -1,20 +1,24 @@
 export default async function getChatKitSessionToken(
-deviceId: string
+  deviceId: string
 ): Promise<string> {
-const response = await fetch("https://api.openai.com/v1/chatkit/sessions", {
+  const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatkit-session`;
+
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
-    "Content-Type": "application/json",
-    "OpenAI-Beta": "chatkit_beta=v1",
-    Authorization: "Bearer " + process.env.VITE_OPENAI_API_SECRET_KEY,
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
     },
     body: JSON.stringify({
-    workflow: { id: "wf_68e6d7e701a88190aabd2667994f8b780f1481883281099a" },
-    user: deviceId,
+      deviceId,
     }),
-});
+  });
 
-const { client_secret } = await response.json();
+  if (!response.ok) {
+    throw new Error(`Failed to get ChatKit session: ${response.statusText}`);
+  }
 
-return client_secret;
+  const { client_secret } = await response.json();
+
+  return client_secret;
 }
