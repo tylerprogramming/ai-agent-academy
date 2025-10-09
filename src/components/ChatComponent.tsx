@@ -40,6 +40,10 @@ export function ChatComponent() {
 
   return (
     <div className="h-full w-full bg-gray-50">
+      <div className="p-4 bg-blue-100 border border-blue-300 rounded mb-4">
+        <p className="text-sm">Debug: ChatKit component area</p>
+        <p className="text-xs">Device ID: {deviceId}</p>
+      </div>
       <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
     </div>
   );
