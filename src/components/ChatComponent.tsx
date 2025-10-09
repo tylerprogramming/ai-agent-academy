@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 declare global {
@@ -30,30 +30,53 @@ function getOrCreateDeviceId(): string {
 
 export function ChatComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const deviceId = getOrCreateDeviceId();
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const checkChatKitLoaded = () => {
+      if (window.openai?.chatkit) {
+        console.log('ChatKit library detected');
+        setIsLoaded(true);
+      } else {
+        console.log('Waiting for ChatKit library...');
+        setTimeout(checkChatKitLoaded, 100);
+      }
+    };
 
-    console.log('Mounting ChatKit...');
+    checkChatKitLoaded();
+  }, []);
 
-    if (window.openai?.chatkit) {
-      window.openai.chatkit.mount({
+  useEffect(() => {
+    if (!containerRef.current || !isLoaded) return;
+
+    console.log('Mounting ChatKit to container...');
+
+    try {
+      window.openai!.chatkit.mount({
         targetElement: containerRef.current,
         api: {
           getChatKitSessionToken: async () => {
             console.log('Getting ChatKit session token for device:', deviceId);
             const token = await getChatKitSessionToken(deviceId);
-            console.log('ChatKit session token received:', token);
+            console.log('ChatKit session token received');
             return token;
           },
         },
       });
       console.log('ChatKit mounted successfully');
-    } else {
-      console.error('ChatKit library not found on window.openai');
+    } catch (error) {
+      console.error('Error mounting ChatKit:', error);
     }
-  }, [deviceId]);
+  }, [isLoaded, deviceId]);
+
+  if (!isLoaded) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-gray-600">Loading chat...</div>
+      </div>
+    );
+  }
 
   return <div ref={containerRef} className="h-full w-full" />;
 }
