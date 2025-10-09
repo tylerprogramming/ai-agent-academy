@@ -48,28 +48,23 @@ export function ChatComponent() {
   useEffect(() => {
     console.log('[ChatKit] ref.current:', ref.current);
     console.log('[ChatKit] control:', control);
+    console.log('[ChatKit] control.handlers:', control?.handlers);
 
     if (ref.current) {
-      console.log('[ChatKit] Web component attributes:', {
-        loaded: ref.current.getAttribute('data-loaded'),
-        colorScheme: ref.current.getAttribute('data-color-scheme'),
-      });
-
       const element = ref.current as any;
-      console.log('[ChatKit] Web component properties before:', {
-        api: element.api,
-        sessionToken: element.sessionToken,
-      });
+      console.log('[ChatKit] Web component api:', element.api);
+      console.log('[ChatKit] Loaded state:', element.getAttribute('data-loaded'));
 
-      // Try setting the api directly on the element
-      if (!element.api) {
-        console.log('[ChatKit] Setting api property directly');
-        element.api = {
-          getChatKitSessionToken: sessionTokenGetter,
-        };
-        console.log('[ChatKit] Web component properties after:', {
-          api: element.api,
-        });
+      // Try to manually trigger initialization
+      if (element.api && !element.getAttribute('data-loaded')) {
+        console.log('[ChatKit] Attempting to call getChatKitSessionToken manually...');
+        element.api.getChatKitSessionToken()
+          .then((token: string) => {
+            console.log('[ChatKit] Manual call successful, token:', token.substring(0, 20));
+          })
+          .catch((error: any) => {
+            console.error('[ChatKit] Manual call failed:', error);
+          });
       }
     }
   }, [ref, control]);
