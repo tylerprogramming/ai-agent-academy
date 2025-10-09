@@ -44,6 +44,20 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
     if (control) {
       console.log('[ChatKit] Control ready:', control);
       console.log('[ChatKit] Control.options:', control.options);
+
+      // Check the DOM element
+      setTimeout(() => {
+        const element = document.querySelector('openai-chatkit');
+        console.log('[ChatKit] DOM element:', element);
+        if (element) {
+          console.log('[ChatKit] Element outerHTML:', element.outerHTML.substring(0, 200));
+          console.log('[ChatKit] Shadow root:', element.shadowRoot);
+          if (element.shadowRoot) {
+            console.log('[ChatKit] Shadow root children:', element.shadowRoot.children);
+            console.log('[ChatKit] Shadow root HTML:', element.shadowRoot.innerHTML.substring(0, 500));
+          }
+        }
+      }, 1000);
     }
   }, [control]);
 
