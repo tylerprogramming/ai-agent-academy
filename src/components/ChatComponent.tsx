@@ -14,7 +14,7 @@ function getOrCreateDeviceId(): string {
   return deviceId;
 }
 
-export default function ChatComponent() {
+export function ChatComponent() {
   const [error, setError] = useState<string | null>(null);
 
   const { control } = useChatKit({
