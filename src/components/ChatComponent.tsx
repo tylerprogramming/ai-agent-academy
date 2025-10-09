@@ -21,19 +21,21 @@ export function ChatComponent() {
     console.log('ChatComponent mounted with deviceId:', deviceId);
   }, [deviceId]);
 
+  const sessionTokenGetter = async () => {
+    console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
+    try {
+      const token = await getChatKitSessionToken(deviceId);
+      console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
+      return token;
+    } catch (error) {
+      console.error('[ChatKit] Error getting session token:', error);
+      throw error;
+    }
+  };
+
   const { control, ref } = useChatKit({
     api: {
-      getChatKitSessionToken: async () => {
-        console.log('[ChatKit] getChatKitSessionToken called for device:', deviceId);
-        try {
-          const token = await getChatKitSessionToken(deviceId);
-          console.log('[ChatKit] Session token received:', token.substring(0, 20) + '...');
-          return token;
-        } catch (error) {
-          console.error('[ChatKit] Error getting session token:', error);
-          throw error;
-        }
-      },
+      getChatKitSessionToken: sessionTokenGetter,
     },
     onError: (error) => {
       console.error('[ChatKit] onError event:', error);
@@ -51,6 +53,12 @@ export function ChatComponent() {
       console.log('[ChatKit] Web component attributes:', {
         loaded: ref.current.getAttribute('data-loaded'),
         colorScheme: ref.current.getAttribute('data-color-scheme'),
+      });
+
+      const element = ref.current as any;
+      console.log('[ChatKit] Web component properties:', {
+        api: element.api,
+        sessionToken: element.sessionToken,
       });
     }
   }, [ref, control]);
