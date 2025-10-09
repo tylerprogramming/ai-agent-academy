@@ -77,8 +77,8 @@ export function ChatComponent() {
       </div>
       <div className="border-2 border-green-500 p-2 bg-white">
         <p className="text-sm mb-2">ChatKit component should render here:</p>
-        <div className="border-2 border-red-500" style={{ minHeight: '600px' }}>
-          <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
+        <div className="border-2 border-red-500">
+          <ChatKit control={control} className="w-full h-[600px]" />
         </div>
       </div>
     </div>
