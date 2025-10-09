@@ -19,11 +19,11 @@ export default async function getChatKitSessionToken(
   console.log('Calling chatkit-session API at:', apiUrl);
   console.log('Request payload:', { deviceId });
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    console.log('Calling chatkit-session API at:', apiUrl);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  console.log('Calling chatkit-session API at:', apiUrl);
 
   const response = await fetch(apiUrl, {
     method: "POST",
