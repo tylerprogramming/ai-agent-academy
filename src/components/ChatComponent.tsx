@@ -25,29 +25,49 @@ function getOrCreateDeviceId(): string {
 
 function ChatKitWidget({ clientToken }: { clientToken: string }) {
   const chatkitRef = useRef<any>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (chatkitRef.current) {
-      console.log('[ChatKit] Calling setOptions with clientToken');
-      chatkitRef.current.setOptions({
-        api: {
-          getClientSecret: async () => clientToken,
-        },
-        startScreen: {
-          greeting: "Welcome! How can I help you today?",
-          prompts: [
-            { label: "Courses", prompt: "Tell me about your courses" },
-            { label: "Getting Started", prompt: "How do I get started?" },
-            { label: "Topics", prompt: "What topics do you cover?" }
-          ],
-        },
-        composer: {
-          placeholder: "Ask me anything...",
-        },
-      });
-      console.log('[ChatKit] setOptions called');
+    const waitForElement = async () => {
+      if (chatkitRef.current) {
+        await customElements.whenDefined('openai-chatkit');
+
+        // Wait a bit more for the component to be fully ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        setIsReady(true);
+      }
+    };
+
+    waitForElement();
+  }, []);
+
+  useEffect(() => {
+    if (isReady && chatkitRef.current && clientToken) {
+      console.log('[ChatKit] Configuring with clientToken');
+      try {
+        chatkitRef.current.setOptions({
+          api: {
+            getClientSecret: async () => clientToken,
+          },
+          startScreen: {
+            greeting: "Welcome! How can I help you today?",
+            prompts: [
+              { label: "Courses", prompt: "Tell me about your courses" },
+              { label: "Getting Started", prompt: "How do I get started?" },
+              { label: "Topics", prompt: "What topics do you cover?" }
+            ],
+          },
+          composer: {
+            placeholder: "Ask me anything...",
+          },
+        });
+        console.log('[ChatKit] Configuration complete');
+      } catch (error) {
+        console.error('[ChatKit] Configuration error:', error);
+      }
     }
-  }, [clientToken]);
+  }, [isReady, clientToken]);
 
   return (
     <openai-chatkit
