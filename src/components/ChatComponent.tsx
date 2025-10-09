@@ -1,4 +1,4 @@
-import { ChatKit } from '@openai/chatkit-react';
+import { ChatKit, useChatKit } from '@openai/chatkit-react';
 import getChatKitSessionToken from '../chatkit';
 import { useState, useEffect } from 'react';
 
