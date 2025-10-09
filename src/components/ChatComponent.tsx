@@ -50,29 +50,34 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
   });
 
   useEffect(() => {
-    console.log('[ChatKit] Effect running - chatkitRef.current:', chatkitRef.current);
-    console.log('[ChatKit] Effect running - control:', control);
-
     if (chatkitRef.current && control) {
-      console.log('[ChatKit] Both ref and control available');
-      console.log('[ChatKit] Element before setInstance:', chatkitRef.current);
-      console.log('[ChatKit] Element methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(chatkitRef.current)));
-
-      // Try to call any initialization method on the element itself
       const element = chatkitRef.current as any;
-      console.log('[ChatKit] Element.init:', element.init);
-      console.log('[ChatKit] Element.connect:', element.connect);
-      console.log('[ChatKit] Element.connectedCallback:', element.connectedCallback);
+
+      console.log('[ChatKit] Setting element properties...');
+
+      // Try setting the options directly on the element
+      element.options = control.options;
+      console.log('[ChatKit] Set element.options:', element.options);
+
+      // Also try setting individual properties
+      if (control.options.api) {
+        element.api = control.options.api;
+        console.log('[ChatKit] Set element.api');
+      }
 
       control.setInstance(chatkitRef.current);
       console.log('[ChatKit] setInstance called');
 
-      // Check if there's an init or start method we need to call
+      // Check what happened
       setTimeout(() => {
-        console.log('[ChatKit] Checking for initialization...');
-        console.log('[ChatKit] Control methods:', Object.keys(control));
-        console.log('[ChatKit] Control.handlers methods:', Object.keys(control.handlers));
-      }, 500);
+        console.log('[ChatKit] After 1s - element.options:', element.options);
+        console.log('[ChatKit] After 1s - element.api:', element.api);
+        console.log('[ChatKit] After 1s - shadow children:', chatkitRef.current?.shadowRoot?.children.length);
+
+        // List all properties on the element
+        const allProps = Object.keys(element);
+        console.log('[ChatKit] Element own properties:', allProps);
+      }, 1000);
     }
   }, [control]);
 
