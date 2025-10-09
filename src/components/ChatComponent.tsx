@@ -1,4 +1,5 @@
 import { useChatKit, ChatKit } from '@openai/chatkit-react';
+import { useEffect } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 function getOrCreateDeviceId(): string {
@@ -16,20 +17,34 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
 
-  const { control } = useChatKit({
+  useEffect(() => {
+    console.log('ChatComponent mounted');
+  }, []);
+
+  const { control, ref } = useChatKit({
     api: {
       getChatKitSessionToken: async () => {
         console.log('Getting ChatKit session token for device:', deviceId);
-        const token = await getChatKitSessionToken(deviceId);
-        console.log('ChatKit session token received');
-        return token;
+        try {
+          const token = await getChatKitSessionToken(deviceId);
+          console.log('ChatKit session token received:', token.substring(0, 20) + '...');
+          return token;
+        } catch (error) {
+          console.error('Error getting ChatKit session token:', error);
+          throw error;
+        }
       },
     },
   });
 
+  useEffect(() => {
+    console.log('useChatKit ref:', ref.current);
+    console.log('useChatKit control:', control);
+  }, [ref, control]);
+
   return (
-    <div className="h-full w-full">
-      <ChatKit control={control} />
+    <div className="h-full w-full bg-gray-50">
+      <ChatKit control={control} className="w-full h-full" />
     </div>
   );
 }
