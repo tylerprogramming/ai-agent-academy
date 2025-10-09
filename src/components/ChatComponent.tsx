@@ -55,6 +55,7 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
 
     if (chatkitRef.current && control) {
       console.log('[ChatKit] Both ref and control available, calling setInstance');
+      console.log('[ChatKit] Control.handlers:', control.handlers);
       control.setInstance(chatkitRef.current);
 
       // Check shadow root after setInstance
@@ -62,8 +63,27 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
         if (chatkitRef.current?.shadowRoot) {
           console.log('[ChatKit] Shadow root children after setInstance:', chatkitRef.current.shadowRoot.children.length);
           console.log('[ChatKit] Shadow root HTML:', chatkitRef.current.shadowRoot.innerHTML.substring(0, 1000));
+
+          // Check element attributes
+          console.log('[ChatKit] Element attributes:', {
+            'data-loaded': chatkitRef.current.getAttribute('data-loaded'),
+            'data-color-scheme': chatkitRef.current.getAttribute('data-color-scheme'),
+          });
+
+          // Try to look for any error messages
+          const allElements = chatkitRef.current.shadowRoot.querySelectorAll('*');
+          console.log('[ChatKit] All shadow DOM elements:', allElements);
         }
       }, 1000);
+
+      // Try waiting longer
+      setTimeout(() => {
+        if (chatkitRef.current?.shadowRoot) {
+          console.log('[ChatKit] After 3s - Shadow root children:', chatkitRef.current.shadowRoot.children.length);
+          const allElements = chatkitRef.current.shadowRoot.querySelectorAll('*');
+          console.log('[ChatKit] After 3s - All shadow DOM elements:', allElements);
+        }
+      }, 3000);
     }
   }, [control]);
 
