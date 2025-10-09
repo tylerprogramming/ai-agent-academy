@@ -1,5 +1,20 @@
-import { ChatKit, useChatKit } from '@openai/chatkit-react';
+import { useEffect, useRef } from 'react';
 import getChatKitSessionToken from '../chatkit';
+
+declare global {
+  interface Window {
+    openai?: {
+      chatkit: {
+        mount: (options: {
+          targetElement: HTMLElement;
+          api: {
+            getChatKitSessionToken: () => Promise<string>;
+          };
+        }) => void;
+      };
+    };
+  }
+}
 
 function getOrCreateDeviceId(): string {
   const DEVICE_ID_KEY = 'chatkit_device_id';
@@ -14,24 +29,31 @@ function getOrCreateDeviceId(): string {
 }
 
 export function ChatComponent() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const deviceId = getOrCreateDeviceId();
 
-  const { control } = useChatKit({
-    api: {
-      async getChatKitSessionToken() {
-        console.log('Getting ChatKit session token for device:', deviceId);
-        const token = await getChatKitSessionToken(deviceId);
-        console.log('ChatKit session token received:', token);
-        return token;
-      },
-    },
-  });
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-  console.log('ChatComponent rendering, control:', control);
+    console.log('Mounting ChatKit...');
 
-  return (
-    <div className="h-full w-full bg-gray-50">
-      <ChatKit control={control} />
-    </div>
-  );
+    if (window.openai?.chatkit) {
+      window.openai.chatkit.mount({
+        targetElement: containerRef.current,
+        api: {
+          getChatKitSessionToken: async () => {
+            console.log('Getting ChatKit session token for device:', deviceId);
+            const token = await getChatKitSessionToken(deviceId);
+            console.log('ChatKit session token received:', token);
+            return token;
+          },
+        },
+      });
+      console.log('ChatKit mounted successfully');
+    } else {
+      console.error('ChatKit library not found on window.openai');
+    }
+  }, [deviceId]);
+
+  return <div ref={containerRef} className="h-full w-full" />;
 }
