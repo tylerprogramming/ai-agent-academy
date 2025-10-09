@@ -14,30 +14,7 @@ function getOrCreateDeviceId(): string {
   return deviceId;
 }
 
-export function ChatComponent() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Wait for ChatKit to be fully loaded
-    const checkChatKit = setInterval(() => {
-      if (typeof window !== 'undefined' && (window as any).ChatKit) {
-        setIsReady(true);
-        clearInterval(checkChatKit);
-      }
-    }, 100);
-
-    // Timeout after 10 seconds
-    const timeout = setTimeout(() => {
-      clearInterval(checkChatKit);
-      setIsReady(true); // Try anyway
-    }, 10000);
-
-    return () => {
-      clearInterval(checkChatKit);
-      clearTimeout(timeout);
-    };
-  }, []);
-
+function ChatKitWrapper() {
   const { control } = useChatKit({
     api: {
       async getClientSecret(existing) {
@@ -52,6 +29,31 @@ export function ChatComponent() {
     },
   });
 
+  return <ChatKit control={control} className="h-full w-full" />;
+}
+
+export function ChatComponent() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkChatKit = setInterval(() => {
+      if (typeof window !== 'undefined' && (window as any).ChatKit) {
+        setIsReady(true);
+        clearInterval(checkChatKit);
+      }
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      clearInterval(checkChatKit);
+      setIsReady(true);
+    }, 10000);
+
+    return () => {
+      clearInterval(checkChatKit);
+      clearTimeout(timeout);
+    };
+  }, []);
+
   if (!isReady) {
     return (
       <div className="h-full w-full flex items-center justify-center">
@@ -60,5 +62,5 @@ export function ChatComponent() {
     );
   }
 
-  return <ChatKit control={control} className="h-full w-full" />;
+  return <ChatKitWrapper />;
 }
