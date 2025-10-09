@@ -50,12 +50,10 @@ function ChatKitWidget({ clientToken }: { clientToken: string }) {
   }, [clientToken]);
 
   return (
-    <div className="h-full w-full">
-      <openai-chatkit
-        ref={chatkitRef}
-        className="block h-[600px] w-full"
-      />
-    </div>
+    <openai-chatkit
+      ref={chatkitRef}
+      style={{ display: 'block', width: '100%', height: '100%' }}
+    />
   );
 }
 
