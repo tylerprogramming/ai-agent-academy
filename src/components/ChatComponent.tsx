@@ -31,14 +31,14 @@ function ChatKitWidget({ clientToken }: { clientToken: string }) {
       console.log('[ChatKit] Calling setOptions with clientToken');
       chatkitRef.current.setOptions({
         api: {
-          clientToken,
+          getClientSecret: async () => clientToken,
         },
         startScreen: {
           greeting: "Welcome! How can I help you today?",
           prompts: [
-            "Tell me about your courses",
-            "How do I get started?",
-            "What topics do you cover?"
+            { text: "Tell me about your courses" },
+            { text: "How do I get started?" },
+            { text: "What topics do you cover?" }
           ],
         },
         composer: {
