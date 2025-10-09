@@ -23,7 +23,7 @@ export function ChatComponent() {
       : 'pending'
   );
   const [error, setError] = useState<string | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
     return () => {
