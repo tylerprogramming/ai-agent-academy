@@ -6,9 +6,13 @@ export function ChatComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log('ChatComponent mounted');
+
   const { control } = useChatKit({
     api: {
       async getClientSecret(existing) {
+        console.log('getClientSecret called, existing:', !!existing);
+
         if (existing) {
           console.log('Using existing client secret');
           setIsLoading(false);
@@ -16,6 +20,7 @@ export function ChatComponent() {
         }
 
         try {
+          console.log('Starting to get new client secret...');
           const deviceId = getOrCreateDeviceId();
           console.log('Getting client secret for device:', deviceId);
           const clientSecret = await getChatKitSessionToken(deviceId);
@@ -32,9 +37,11 @@ export function ChatComponent() {
     },
     onReady: () => {
       console.log('ChatKit is ready');
+      setIsLoading(false);
     },
     onError: (err) => {
       console.error('ChatKit error:', err);
+      setIsLoading(false);
       setError(err instanceof Error ? err.message : 'ChatKit encountered an error');
     },
   });
