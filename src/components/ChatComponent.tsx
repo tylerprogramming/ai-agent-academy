@@ -1,6 +1,14 @@
-import { useChatKit, ChatKit } from '@openai/chatkit-react';
-import { useEffect, useState } from 'react';
+import { useChatKit } from '@openai/chatkit-react';
+import { useEffect, useState, useRef } from 'react';
 import getChatKitSessionToken from '../chatkit';
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'openai-chatkit': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    }
+  }
+}
 
 function getOrCreateDeviceId(): string {
   const DEVICE_ID_KEY = 'chatkit_device_id';
@@ -16,6 +24,7 @@ function getOrCreateDeviceId(): string {
 
 function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceId: string }) {
   console.log('[ChatKitWidget] Rendering with token:', clientToken.substring(0, 20) + '...');
+  const chatkitRef = useRef<HTMLElement>(null);
 
   const { control } = useChatKit({
     api: {
@@ -41,53 +50,20 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
   });
 
   useEffect(() => {
-    if (control) {
-      console.log('[ChatKit] Control ready:', control);
-      console.log('[ChatKit] Control.options:', control.options);
-      console.log('[ChatKit] Control.setInstance:', control.setInstance);
-      console.log('[ChatKit] Type of setInstance:', typeof control.setInstance);
+    console.log('[ChatKit] Effect running - chatkitRef.current:', chatkitRef.current);
+    console.log('[ChatKit] Effect running - control:', control);
 
-      // Check the DOM element
+    if (chatkitRef.current && control) {
+      console.log('[ChatKit] Both ref and control available, calling setInstance');
+      control.setInstance(chatkitRef.current);
+
+      // Check shadow root after setInstance
       setTimeout(() => {
-        const element = document.querySelector('openai-chatkit');
-        console.log('[ChatKit] DOM element:', element);
-        if (element) {
-          console.log('[ChatKit] Element outerHTML:', element.outerHTML.substring(0, 200));
-          console.log('[ChatKit] Shadow root:', element.shadowRoot);
-          if (element.shadowRoot) {
-            console.log('[ChatKit] Shadow root children:', element.shadowRoot.children);
-            console.log('[ChatKit] Shadow root HTML:', element.shadowRoot.innerHTML.substring(0, 500));
-          }
-
-          // Check if element has any special properties
-          console.log('[ChatKit] Element properties:', Object.keys(element));
-          console.log('[ChatKit] Element._ck:', (element as any)._ck);
-          console.log('[ChatKit] Element.profile:', (element as any).profile);
-          console.log('[ChatKit] Element.capabilities:', (element as any).capabilities);
+        if (chatkitRef.current?.shadowRoot) {
+          console.log('[ChatKit] Shadow root children after setInstance:', chatkitRef.current.shadowRoot.children.length);
+          console.log('[ChatKit] Shadow root HTML:', chatkitRef.current.shadowRoot.innerHTML.substring(0, 1000));
         }
       }, 1000);
-
-      // Try calling setInstance manually
-      setTimeout(() => {
-        console.log('[ChatKit] Attempting manual setInstance call...');
-        const element = document.querySelector('openai-chatkit');
-        if (element) {
-          try {
-            control.setInstance(element);
-            console.log('[ChatKit] Manual setInstance succeeded');
-
-            // Check shadow root again after setInstance
-            setTimeout(() => {
-              console.log('[ChatKit] After setInstance - Shadow root children:', element.shadowRoot?.children.length);
-              if (element.shadowRoot) {
-                console.log('[ChatKit] After setInstance - Shadow root HTML:', element.shadowRoot.innerHTML.substring(0, 500));
-              }
-            }, 500);
-          } catch (error) {
-            console.error('[ChatKit] Manual setInstance failed:', error);
-          }
-        }
-      }, 2000);
     }
   }, [control]);
 
@@ -101,8 +77,11 @@ function ChatKitWidget({ clientToken, deviceId }: { clientToken: string; deviceI
       </div>
       <div className="border-2 border-green-500 p-2 bg-white">
         <p className="text-sm mb-2">ChatKit component should render here:</p>
-        <div className="border-2 border-red-500">
-          <ChatKit control={control} className="w-full h-[600px]" />
+        <div className="border-2 border-red-500 h-[600px]">
+          <openai-chatkit
+            ref={chatkitRef}
+            style={{ width: '100%', height: '100%', display: 'block' }}
+          />
         </div>
       </div>
     </div>
