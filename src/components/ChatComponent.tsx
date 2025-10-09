@@ -17,7 +17,7 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
      const { control } = useChatKit({
        api: {
-         async getChatKitSessionToken(existing) {
+         async getChatKitSessionToken() {
            const res = await fetch('/api/chatkit/session', {
              method: 'POST',
              headers: {
