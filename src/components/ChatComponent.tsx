@@ -17,6 +17,7 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('ChatComponent mounted with deviceId:', deviceId);
@@ -32,15 +33,20 @@ export function ChatComponent() {
     return () => clearInterval(checkScript);
   }, [deviceId]);
 
+  useEffect(() => {
+    if (scriptLoaded && !clientSecret) {
+      console.log('[ChatKit] Fetching client secret...');
+      getChatKitSessionToken(deviceId).then((token) => {
+        console.log('[ChatKit] Got token:', token.substring(0, 20) + '...');
+        setClientSecret(token);
+      }).catch((error) => {
+        console.error('[ChatKit] Failed to get token:', error);
+      });
+    }
+  }, [scriptLoaded, deviceId, clientSecret]);
+
   const { control } = useChatKit({
-    api: {
-      async getClientSecret() {
-        console.log('[ChatKit] getClientSecret called for device:', deviceId);
-        const token = await getChatKitSessionToken(deviceId);
-        console.log('[ChatKit] Returning token:', token.substring(0, 20) + '...');
-        return token;
-      },
-    },
+    clientSecret: clientSecret || undefined,
     onError: (error) => {
       console.error('[ChatKit] onError event:', error);
     },
@@ -56,7 +62,7 @@ export function ChatComponent() {
     }
   }, [scriptLoaded, control]);
 
-  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control);
+  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control, 'clientSecret:', !!clientSecret);
 
   return (
     <div className="h-full w-full bg-gray-50">
