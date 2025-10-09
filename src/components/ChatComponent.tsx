@@ -106,7 +106,12 @@ export function ChatComponent() {
     },
   });
 
-  console.log('[ChatKit] Render state:', { scriptStatus, hasControl: Boolean(chatkit.control), error });
+  console.log('[ChatKit] Render state:', {
+    scriptStatus,
+    hasControl: Boolean(chatkit.control),
+    controlValue: chatkit.control,
+    error
+  });
 
   if (error) {
     return (
@@ -127,12 +132,19 @@ export function ChatComponent() {
     );
   }
 
+  if (!chatkit.control) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <p className="text-gray-600">Initializing chat...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="h-full w-full relative">
       <ChatKit
         control={chatkit.control}
-        className="block"
-        style={{ flex: 1, minHeight: 0, width: '100%', height: '100%' }}
+        className={scriptStatus === 'ready' ? 'block h-full w-full' : 'pointer-events-none opacity-0'}
       />
     </div>
   );
