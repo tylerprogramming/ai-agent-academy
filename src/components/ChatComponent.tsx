@@ -49,6 +49,17 @@ export function ChatComponent() {
     },
   });
 
+  useEffect(() => {
+    if (scriptLoaded && control) {
+      console.log('[ChatKit] Starting session...');
+      control.startSession().then(() => {
+        console.log('[ChatKit] Session started successfully');
+      }).catch((err) => {
+        console.error('[ChatKit] Session start failed:', err);
+      });
+    }
+  }, [scriptLoaded, control]);
+
   return (
     <div className="h-full w-full bg-gray-50">
       <div className="p-4 bg-blue-100 border border-blue-300 rounded mb-4">
