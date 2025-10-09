@@ -2,12 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'openai-chatkit': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        ref?: React.Ref<any>;
-      };
-    }
+  interface Window {
+    ChatKit: any;
   }
 }
 
@@ -24,29 +20,22 @@ function getOrCreateDeviceId(): string {
 }
 
 function ChatKitWidget({ clientToken }: { clientToken: string }) {
-  const chatkitRef = useRef<any>(null);
-  const [isReady, setIsReady] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const instanceRef = useRef<any>(null);
 
   useEffect(() => {
-    const waitForElement = async () => {
-      if (chatkitRef.current) {
-        await customElements.whenDefined('openai-chatkit');
+    const initChatKit = async () => {
+      if (!containerRef.current || instanceRef.current) return;
 
-        // Wait a bit more for the component to be fully ready
+      // Wait for ChatKit to be available
+      while (!window.ChatKit) {
         await new Promise(resolve => setTimeout(resolve, 100));
-
-        setIsReady(true);
       }
-    };
 
-    waitForElement();
-  }, []);
+      console.log('[ChatKit] Initializing with ChatKit.create()');
 
-  useEffect(() => {
-    if (isReady && chatkitRef.current && clientToken) {
-      console.log('[ChatKit] Configuring with clientToken');
       try {
-        chatkitRef.current.setOptions({
+        instanceRef.current = window.ChatKit.create(containerRef.current, {
           api: {
             getClientSecret: async () => clientToken,
           },
@@ -62,17 +51,26 @@ function ChatKitWidget({ clientToken }: { clientToken: string }) {
             placeholder: "Ask me anything...",
           },
         });
-        console.log('[ChatKit] Configuration complete');
+        console.log('[ChatKit] Instance created successfully');
       } catch (error) {
-        console.error('[ChatKit] Configuration error:', error);
+        console.error('[ChatKit] Initialization error:', error);
       }
-    }
-  }, [isReady, clientToken]);
+    };
+
+    initChatKit();
+
+    return () => {
+      if (instanceRef.current?.destroy) {
+        instanceRef.current.destroy();
+        instanceRef.current = null;
+      }
+    };
+  }, [clientToken]);
 
   return (
-    <openai-chatkit
-      ref={chatkitRef}
-      style={{ display: 'block', width: '100%', height: '100%' }}
+    <div
+      ref={containerRef}
+      style={{ width: '100%', height: '100%' }}
     />
   );
 }
