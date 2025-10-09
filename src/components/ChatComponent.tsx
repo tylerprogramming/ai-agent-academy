@@ -1,4 +1,5 @@
 import { ChatKit, useChatKit } from '@openai/chatkit-react';
+import { useEffect, useState } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 function getOrCreateDeviceId(): string {
@@ -14,6 +15,29 @@ function getOrCreateDeviceId(): string {
 }
 
 export function ChatComponent() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Wait for ChatKit to be fully loaded
+    const checkChatKit = setInterval(() => {
+      if (typeof window !== 'undefined' && (window as any).ChatKit) {
+        setIsReady(true);
+        clearInterval(checkChatKit);
+      }
+    }, 100);
+
+    // Timeout after 10 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(checkChatKit);
+      setIsReady(true); // Try anyway
+    }, 10000);
+
+    return () => {
+      clearInterval(checkChatKit);
+      clearTimeout(timeout);
+    };
+  }, []);
+
   const { control } = useChatKit({
     api: {
       async getClientSecret(existing) {
@@ -27,6 +51,14 @@ export function ChatComponent() {
       },
     },
   });
+
+  if (!isReady) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-gray-500">Loading chat...</div>
+      </div>
+    );
+  }
 
   return <ChatKit control={control} className="h-full w-full" />;
 }
