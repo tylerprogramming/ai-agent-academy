@@ -23,6 +23,7 @@ export function ChatComponent() {
       : 'pending'
   );
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -78,12 +79,15 @@ export function ChatComponent() {
 
   const getClientSecret = useCallback(async () => {
     console.log('[ChatKit] Fetching client secret');
+    setIsInitializing(true);
     try {
       const token = await getChatKitSessionToken(deviceId);
-      console.log('[ChatKit] Client secret obtained');
+      console.log('[ChatKit] Client secret obtained:', token.substring(0, 20) + '...');
+      setIsInitializing(false);
       return token;
     } catch (error) {
       console.error('[ChatKit] Failed to get client secret:', error);
+      setIsInitializing(false);
       throw error;
     }
   }, [deviceId]);
@@ -103,19 +107,24 @@ export function ChatComponent() {
     },
     onError: ({ error }: { error: unknown }) => {
       console.error('[ChatKit] Error:', error);
+      setIsInitializing(false);
+    },
+    onResponseStart: () => {
+      console.log('[ChatKit] Response started');
+      setIsInitializing(false);
     },
   });
 
   console.log('[ChatKit] Render state:', {
     scriptStatus,
     hasControl: Boolean(chatkit.control),
-    controlValue: chatkit.control,
+    isInitializing,
     error
   });
 
   if (error) {
     return (
-      <div className="h-full w-full flex items-center justify-center p-4">
+      <div className="h-full w-full flex items-center justify-center p-4 bg-white">
         <div className="text-center">
           <p className="text-red-600 font-semibold mb-2">Failed to load chat</p>
           <p className="text-sm text-gray-600">{error}</p>
@@ -126,7 +135,7 @@ export function ChatComponent() {
 
   if (scriptStatus === 'pending') {
     return (
-      <div className="h-full w-full flex items-center justify-center">
+      <div className="h-full w-full flex items-center justify-center bg-white">
         <p className="text-gray-600">Loading assistant...</p>
       </div>
     );
@@ -134,17 +143,22 @@ export function ChatComponent() {
 
   if (!chatkit.control) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
+      <div className="h-full w-full flex items-center justify-center bg-white">
         <p className="text-gray-600">Initializing chat...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full w-full relative">
+    <div className="h-full w-full relative bg-white">
+      {isInitializing && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <p className="text-gray-600">Starting session...</p>
+        </div>
+      )}
       <ChatKit
         control={chatkit.control}
-        className={scriptStatus === 'ready' ? 'block h-full w-full' : 'pointer-events-none opacity-0'}
+        className="block h-full w-full"
       />
     </div>
   );
