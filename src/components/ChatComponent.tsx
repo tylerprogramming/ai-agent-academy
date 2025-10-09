@@ -1,5 +1,5 @@
 import { useChatKit, ChatKit } from '@openai/chatkit-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import getChatKitSessionToken from '../chatkit';
 
 function getOrCreateDeviceId(): string {
@@ -16,9 +16,20 @@ function getOrCreateDeviceId(): string {
 
 export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
     console.log('ChatComponent mounted with deviceId:', deviceId);
+
+    const checkScript = setInterval(() => {
+      if (typeof customElements.get('openai-chatkit') !== 'undefined') {
+        console.log('[ChatKit] Web component registered');
+        setScriptLoaded(true);
+        clearInterval(checkScript);
+      }
+    }, 100);
+
+    return () => clearInterval(checkScript);
   }, [deviceId]);
 
   const { control } = useChatKit({
@@ -43,8 +54,13 @@ export function ChatComponent() {
       <div className="p-4 bg-blue-100 border border-blue-300 rounded mb-4">
         <p className="text-sm">Debug: ChatKit component area</p>
         <p className="text-xs">Device ID: {deviceId}</p>
+        <p className="text-xs">Script loaded: {scriptLoaded ? 'Yes' : 'No'}</p>
       </div>
-      <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
+      {scriptLoaded ? (
+        <ChatKit control={control} style={{ width: '100%', height: '100%' }} />
+      ) : (
+        <div className="p-4">Loading ChatKit...</div>
+      )}
     </div>
   );
 }
