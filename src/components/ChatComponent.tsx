@@ -17,7 +17,6 @@ function getOrCreateDeviceId(): string {
 export function ChatComponent() {
   const deviceId = getOrCreateDeviceId();
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('ChatComponent mounted with deviceId:', deviceId);
@@ -33,20 +32,20 @@ export function ChatComponent() {
     return () => clearInterval(checkScript);
   }, [deviceId]);
 
-  useEffect(() => {
-    if (scriptLoaded && !clientSecret) {
-      console.log('[ChatKit] Fetching client secret...');
-      getChatKitSessionToken(deviceId).then((token) => {
-        console.log('[ChatKit] Got token:', token.substring(0, 20) + '...');
-        setClientSecret(token);
-      }).catch((error) => {
-        console.error('[ChatKit] Failed to get token:', error);
-      });
-    }
-  }, [scriptLoaded, deviceId, clientSecret]);
-
   const { control } = useChatKit({
-    clientSecret: clientSecret || undefined,
+    api: {
+      async getClientSecret(existingToken) {
+        console.log('[ChatKit] getClientSecret called, existingToken:', !!existingToken);
+        try {
+          const token = await getChatKitSessionToken(deviceId);
+          console.log('[ChatKit] Returning token:', token.substring(0, 20) + '...');
+          return token;
+        } catch (error) {
+          console.error('[ChatKit] Failed to get token:', error);
+          throw error;
+        }
+      },
+    },
     onError: (error) => {
       console.error('[ChatKit] onError event:', error);
     },
@@ -62,14 +61,10 @@ export function ChatComponent() {
     }
   }, [scriptLoaded, control]);
 
-  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control, 'clientSecret:', !!clientSecret);
+  console.log('[ChatKit] Rendering, scriptLoaded:', scriptLoaded, 'control:', !!control);
 
   if (!scriptLoaded) {
     return <div className="p-4">Loading ChatKit script...</div>;
-  }
-
-  if (!clientSecret) {
-    return <div className="p-4">Fetching session token...</div>;
   }
 
   return (
@@ -78,7 +73,6 @@ export function ChatComponent() {
         <p className="text-sm">Debug: ChatKit component area</p>
         <p className="text-xs">Device ID: {deviceId}</p>
         <p className="text-xs">Script loaded: {scriptLoaded ? 'Yes' : 'No'}</p>
-        <p className="text-xs">Client secret: {clientSecret ? clientSecret.substring(0, 20) + '...' : 'None'}</p>
         <p className="text-xs">Control: {control ? 'Ready' : 'Not ready'}</p>
       </div>
       <div className="border-2 border-green-500 p-2 bg-white">
