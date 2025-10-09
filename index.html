@@ -17,6 +17,7 @@
       script.onload = function() {
         console.log('ChatKit library loaded successfully');
         console.log('window.openai:', window.openai);
+        console.log('window keys:', Object.keys(window).filter(k => k.toLowerCase().includes('chat') || k.toLowerCase().includes('openai')));
       };
       console.log('Loading ChatKit from:', script.src);
       document.head.appendChild(script);
