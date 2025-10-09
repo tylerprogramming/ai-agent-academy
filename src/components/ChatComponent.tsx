@@ -36,9 +36,9 @@ function ChatKitWidget({ clientToken }: { clientToken: string }) {
         startScreen: {
           greeting: "Welcome! How can I help you today?",
           prompts: [
-            { text: "Tell me about your courses" },
-            { text: "How do I get started?" },
-            { text: "What topics do you cover?" }
+            { label: "Courses", prompt: "Tell me about your courses" },
+            { label: "Getting Started", prompt: "How do I get started?" },
+            { label: "Topics", prompt: "What topics do you cover?" }
           ],
         },
         composer: {
