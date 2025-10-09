@@ -15,20 +15,15 @@ function getOrCreateDeviceId(): string {
 }
 
 export function ChatComponent() {
-     const { control } = useChatKit({
-       api: {
-         async getChatKitSessionToken() {
-           const res = await fetch('/api/chatkit/session', {
-             method: 'POST',
-             headers: {
-               'Content-Type': 'application/json',
-             },
-           });
-           const { client_secret } = await res.json();
-           return client_secret;
-         },
-       },
-     });
+  const deviceId = getOrCreateDeviceId();
 
-     return <ChatKit control={control} className="h-[600px] w-[320px]" />;
-   }
+  const { control } = useChatKit({
+    api: {
+      async getChatKitSessionToken() {
+        return await getChatKitSessionToken(deviceId);
+      },
+    },
+  });
+
+  return <ChatKit control={control} className="h-full w-full" />;
+}
