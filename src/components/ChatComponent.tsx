@@ -16,12 +16,14 @@ function getOrCreateDeviceId(): string {
 
 export function ChatComponent() {
   const [error, setError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   const { control } = useChatKit({
     api: {
       async getClientSecret(existing) {
         if (existing) {
           console.log('Using existing client secret');
+          setIsReady(true);
           return existing;
         }
 
@@ -30,6 +32,7 @@ export function ChatComponent() {
           console.log('Getting client secret for device:', deviceId);
           const clientSecret = await getChatKitSessionToken(deviceId);
           console.log('Successfully got client secret');
+          setIsReady(true);
           return clientSecret;
         } catch (err) {
           console.error('Error getting client secret:', err);
@@ -44,7 +47,6 @@ export function ChatComponent() {
     return (
       <div className="h-full w-full flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
           <p className="font-semibold text-gray-900 mb-2">Chat unavailable</p>
           <p className="text-sm text-gray-600 mb-4">{error}</p>
           <button
@@ -54,6 +56,14 @@ export function ChatComponent() {
             Reload
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (!isReady) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-gray-600">Loading chat...</div>
       </div>
     );
   }
