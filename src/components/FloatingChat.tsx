@@ -1,12 +1,12 @@
 import { MessageSquare, X } from 'lucide-react';
-import ChatComponent from './ChatComponent';
+import { ChatComponent } from './ChatComponent';
 
 interface FloatingChatProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-export default function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
+export function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
 
   return (
     <>
@@ -17,7 +17,7 @@ export default function FloatingChat({ isOpen, onToggle }: FloatingChatProps) {
         {isOpen ? (
           <X className="w-6 h-6" />
         ) : (
-          <MessageCircle className="w-6 h-6" />
+          <MessageSquare className="w-6 h-6" />
         )}
       </button>
 
