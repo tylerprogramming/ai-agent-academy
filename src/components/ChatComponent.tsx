@@ -82,7 +82,7 @@ export function ChatComponent() {
     setIsInitializing(true);
     try {
       const token = await getChatKitSessionToken(deviceId);
-      console.log('[ChatKit] Client secret obtained:', token.substring(0, 20) + '...');
+      console.log('[ChatKit] Client secret obtained');
       setIsInitializing(false);
       return token;
     } catch (error) {

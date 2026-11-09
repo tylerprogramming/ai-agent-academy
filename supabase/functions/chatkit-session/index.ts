@@ -22,6 +22,10 @@ Deno.serve(async (req) => {
       throw new Error("OPENAI_API_SECRET_KEY environment variable is not set");
     }
 
+    if (!workflowId) {
+      throw new Error("CHATKIT_WORKFLOW_ID environment variable is not set");
+    }
+
     const { deviceId } = await req.json();
 
     if (!deviceId) {
@@ -65,10 +69,11 @@ Deno.serve(async (req) => {
       }
     });
   } catch (error) {
+    // Full detail (including any OpenAI error body) goes to the function logs only.
     console.error("Error in chatkit-session function:", error);
 
     return new Response(JSON.stringify({
-      error: error instanceof Error ? error.message : "An error occurred"
+      error: "Could not start a chat session"
     }), {
       status: 500,
       headers: {
